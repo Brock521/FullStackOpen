@@ -22,15 +22,15 @@ export default function CountryList({countryData}){
 
 
       return(
-        <>
-        
+        <>     
        Find Country: <input onChange={showFilteredCountries}></input>
         
        {
         activeCountries.length <= 10 ? 
 
         activeCountries.length == 1 ? 
-            <Country countryName={activeCountries[0]}/>
+        
+            <Country country={activeCountries[0]}/>
         :
 
         activeCountries.map((info)=>{
