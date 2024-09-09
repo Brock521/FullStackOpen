@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import PersonForm from './PersonForm.jsx';
 import Filter from './Filter.jsx';
 import PersonsService from './services/PersonsService.jsx';
+import Notification from './Notification.jsx';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [notificationMessage, setNotifcationMessage] = useState(null);
+  const [notificationType, setNotifcationType] = useState(null);
 
   // Function to handle the form submission
   function handleSubmit(name, number) {
@@ -41,6 +44,13 @@ const App = () => {
         .then((createdPerson) => {
           // Update the state with the new person data from the server
           setPersons((prevPersons) => [...prevPersons, createdPerson]);
+          
+          let notificationMessage = "Entry was added successfully: " + createdPerson.name;     
+          setNotifcationMessage(notificationMessage); 
+          setTimeout(()=>{
+            setNotifcationMessage(null);
+          },3000);
+
         })
         .catch((error) => {
           console.error('Failed to create entry:', error);
@@ -63,7 +73,15 @@ const App = () => {
             return PersonsService.getAll();
           })
           .then((data) => {
+            
             setPersons(data); // Update state with the new list of persons
+            
+            let notificationMessage = "Entry was deleted successfully";     
+            setNotifcationMessage(notificationMessage); 
+            setTimeout(()=>{
+              setNotifcationMessage(null);
+            },3000);
+            
           })
           .catch((error) => {
             console.error('Failed to delete entry:', error);
@@ -90,9 +108,23 @@ const App = () => {
           setPersons((prevPersons) =>
             prevPersons.map((person) => (person.id !== id ? person : updatedPerson))
           );
+
+          let notificationMessage = "Entry was updated successfully: " + updatedPerson.name + " " + updatedPerson.number;     
+          setNotifcationMessage(notificationMessage); 
+          setTimeout(()=>{
+            setNotifcationMessage(null);
+          },3000);
         })
         .catch((error) => {
-          console.error('Failed to update entry:', error);
+          console.error('Failed to update entry :', error);
+          let notificationMessage = 'Failed to update entry:' + entryToUpdate.name + " " + entryToUpdate.number + ". Entry was already removed from the server.";     
+          setNotifcationMessage(notificationMessage);
+          setNotifcationType('error'); 
+          setTimeout(()=>{
+            setNotifcationMessage(null);
+            setNotifcationType(null); 
+          },3000);
+
         });
     }
   }
@@ -119,6 +151,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message = {notificationMessage} notifType={notificationType}/>
       <PersonForm onSubmit={handleSubmit} />
       <h2>Numbers</h2>
       <Filter persons={persons} onDelete={deleteEntry} />
