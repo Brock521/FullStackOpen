@@ -19,11 +19,11 @@ public class PhoneBookController {
         this.phoneBookRepository = phoneBookRepository;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<PhoneBookEntry> findByID(@PathVariable Long id) {
-       Optional<PhoneBookEntry> phoneBookEntryOptional = phoneBookRepository.findById(id);
-        if(phoneBookEntryOptional.isPresent()){
-            return ResponseEntity.ok(phoneBookEntryOptional.get());
+       Optional<PhoneBookEntry> phoneBookEntry = phoneBookRepository.findById(id);
+        if(phoneBookEntry.isPresent()){
+            return ResponseEntity.ok(phoneBookEntry.get());
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -39,7 +39,16 @@ public class PhoneBookController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<List<PhoneBookEntry>> deleteEntry(@PathVariable long id) {
+
+        if (phoneBookRepository.findById(id).isPresent()){
+            phoneBookRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }
