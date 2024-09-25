@@ -31,7 +31,7 @@ const Filter = ({ persons, onDelete }) => {
 
       {queriedNames.map((person) => (
         <p key={person.id}>
-          {person.name} {person.number}{" "}
+          {person.name} {person.phoneNumber}{" "}
           <button onClick={() => onDelete(person.id)}>Delete</button>
         </p>
       ))}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = 'http://localhost:3001/persons';
+const baseURL = 'http://localhost:3031/PhoneBook/Api';
 
 // Fetch all persons from the server
 function getAll() {
