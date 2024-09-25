@@ -5,5 +5,5 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("PHONEBOOKENTRIES")
-public record PhoneBookEntry(@Id long id, String name, @Column("PHONENUMBER") String phoneNumber) {
+public record PhoneBookEntry(@Id Long id, String name, @Column("PHONENUMBER") String phoneNumber) {
 }

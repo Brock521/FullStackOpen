@@ -4,45 +4,51 @@ import Filter from './Filter.jsx';
 import PersonsService from './services/PersonsService.jsx';
 import Notification from './Notification.jsx';
 
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [notificationMessage, setNotifcationMessage] = useState(null);
   const [notificationType, setNotifcationType] = useState(null);
 
   // Function to handle the form submission
-  function handleSubmit(name, number) {
-  
-    console.log('In App-handleSubmit');
-
-    // Check if the name already exists and get its ID
-    let existingEntryID = getExistingEntryID(name);
-    console.log(existingEntryID);
-
-    if (existingEntryID === undefined) {
-      // If the name does not exist, add a new entry
-      addEntry(name, number);
-    } else {
-      // If the name exists, update the existing entry
-      updateEntry(name, number, existingEntryID);
-    }
-
-    // Fetch the updated list from the server
-    PersonsService.getAll()
-      .then((data) => {
-        setPersons(data); // Directly use the data since getAll already returns response.data
-      })
-      .catch((error) => {
+  async function handleSubmit(name, phoneNumber) {
+      console.log('In App-handleSubmit');
+    
+      // Check if the name already exists and get its ID
+      let existingEntryID = getExistingEntryID(name);
+      console.log("Existing Entry ID:", existingEntryID);
+    
+      if (existingEntryID === undefined) {
+        // If the name does not exist, add a new entry
+        await addEntry(name, phoneNumber); // Use await to wait for the async operation to complete
+      } else {
+        // If the name exists, update the existing entry
+        await updateEntry(name, phoneNumber, existingEntryID); // Ensure this also completes before moving on
+      }
+    
+      try {
+        // Fetch the updated list from the server
+        const data = await PersonsService.getAll();
+        console.log('Fetched persons from server:', data);
+        setPersons(data); // Update the state with the new data
+      } catch (error) {
         console.error('Failed to fetch persons:', error);
-      });
+      }
+    
+      console.log('Finished handleSubmit function');
   }
 
   // Function to add a new entry
-  function addEntry(name, number) {
+  async function addEntry(name, phoneNumber) {
+
+    console.log('In App-addEntry');
     if (!persons.some((person) => person.name === name)) {
-      let entry = { name: name, number: number };
-      PersonsService.create(entry)
+      let entry = { name: name, phoneNumber: phoneNumber };
+      await PersonsService.create(entry)
         .then((createdPerson) => {
           // Update the state with the new person data from the server
+          console.log("Entered Info:",name,phoneNumber);
+          console.log("Created new entry with status:", createdPerson.name, createdPerson.phoneNumber);
           setPersons((prevPersons) => [...prevPersons, createdPerson]);
           
           let notificationMessage = "Entry was added successfully: " + createdPerson.name;     
@@ -59,7 +65,7 @@ const App = () => {
   }
 
   // Function to delete an entry
-  function deleteEntry(id) {
+  async function deleteEntry(id) {
     const foundEntry = persons.find((entry) => entry.id === id);
 
     if (foundEntry) {
@@ -67,7 +73,7 @@ const App = () => {
         'Would you like to remove this entry: '.concat(foundEntry.name)
       );
       if (confirmation) {
-        PersonsService.deleteEntry(id)
+        await PersonsService.deleteEntry(id)
           .then(() => {
             // Fetch the updated list of persons after deletion
             return PersonsService.getAll();
@@ -93,23 +99,25 @@ const App = () => {
   }
 
   // Function to update an entry
-  function updateEntry(name, number, id) {
+  async function updateEntry(name, phoneNumber, id) {
+    
+    console.log('In App-update Entry for id: ' + id);
     const entryToUpdate = persons.find((person) => person.name === name);
 
     let confirmation = window.confirm(
-      `A person with this number already exists. Would you like to replace the existing number with the new one? ${entryToUpdate.name}: ${entryToUpdate.number}`
+      `A person with this number already exists. Would you like to replace the existing number with the new one? ${entryToUpdate.name}: ${entryToUpdate.phoneNumber}`
     );
 
     if (confirmation) {
       console.log('Updating number');
-      PersonsService.update(id, { name, number })
+      await PersonsService.update(id, { name, phoneNumber })
         .then((updatedPerson) => {
           // Update the state after a successful update
           setPersons((prevPersons) =>
             prevPersons.map((person) => (person.id !== id ? person : updatedPerson))
           );
 
-          let notificationMessage = "Entry was updated successfully: " + updatedPerson.name + " " + updatedPerson.number;     
+          let notificationMessage = "Entry was updated successfully: " + updatedPerson.name + " " + updatedPerson.phoneNumber;
           setNotifcationMessage(notificationMessage); 
           setTimeout(()=>{
             setNotifcationMessage(null);
@@ -117,7 +125,7 @@ const App = () => {
         })
         .catch((error) => {
           console.error('Failed to update entry :', error);
-          let notificationMessage = 'Failed to update entry:' + entryToUpdate.name + " " + entryToUpdate.number + ". Entry was already removed from the server.";     
+          let notificationMessage = 'Failed to update entry:' + entryToUpdate.name + " " + entryToUpdate.phoneNumber + ". Entry was already removed from the server.";
           setNotifcationMessage(notificationMessage);
           setNotifcationType('error'); 
           setTimeout(()=>{
@@ -139,13 +147,22 @@ const App = () => {
 
   // Effect hook to fetch the initial list of persons from the server
   useEffect(() => {
-    PersonsService.getAll()
-      .then((data) => {
-        setPersons(data); // Directly use the data since getAll already returns response.data
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        const data = await PersonsService.getAll();
+        setPersons(data);
+      } catch (error) {
         console.error('Failed to fetch persons:', error);
-      });
+        setNotifcationMessage('Failed to fetch persons. Please try again later.');
+        setNotifcationType('error');
+        setTimeout(() => {
+          setNotifcationMessage(null);
+          setNotifcationType(null);
+        }, 3000);
+      }
+    };
+  
+    fetchData();
   }, []);
 
   return (

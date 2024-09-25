@@ -3,6 +3,7 @@ const baseURL = 'http://localhost:3031/PhoneBook/Api';
 
 // Fetch all persons from the server
 function getAll() {
+    console.log("Fetching all persons...");
     return axios.get(baseURL).then((response) => {
         console.log("Fetched all persons:", response.data);
         return response.data;  // Return the list of persons

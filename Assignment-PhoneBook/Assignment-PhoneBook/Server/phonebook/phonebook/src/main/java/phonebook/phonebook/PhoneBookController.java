@@ -41,6 +41,24 @@ public class PhoneBookController {
         }
     }
 
+    @PutMapping("/{id}")
+    private ResponseEntity<Void> updateEntry(@PathVariable Long id, @RequestBody PhoneBookEntry incomingPhoneBookEntry) {
+        Optional<PhoneBookEntry> existingPhoneBookEntry = phoneBookRepository.findById(id);
+        if (existingPhoneBookEntry.isPresent()) {
+            PhoneBookEntry updatedPhoneBookEntry = new PhoneBookEntry(id, incomingPhoneBookEntry.name(), incomingPhoneBookEntry.phoneNumber());
+            phoneBookRepository.save(updatedPhoneBookEntry);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping()
+    public ResponseEntity<PhoneBookEntry> saveEntry(@RequestBody PhoneBookEntry newPhoneBookRequest){
+        PhoneBookEntry savedPhoneBookEntry = new PhoneBookEntry(null,newPhoneBookRequest.name(), newPhoneBookRequest.phoneNumber());
+        phoneBookRepository.save(savedPhoneBookEntry);
+        return ResponseEntity.ok(newPhoneBookRequest);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<List<PhoneBookEntry>> deleteEntry(@PathVariable long id) {
 
