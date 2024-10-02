@@ -7,17 +7,17 @@ import Notification from './Notification.jsx';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [notificationMessage, setNotifcationMessage] = useState(null);
-  const [notificationType, setNotifcationType] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
 
   // Function to handle the form submission
   async function handleSubmit(name, phoneNumber) {
       console.log('In App-handleSubmit');
-    
+
       // Check if the name already exists and get its ID
       let existingEntryID = getExistingEntryID(name);
       console.log("Existing Entry ID:", existingEntryID);
-    
+
       if (existingEntryID === undefined) {
         // If the name does not exist, add a new entry
         await addEntry(name, phoneNumber); // Use await to wait for the async operation to complete
@@ -25,7 +25,7 @@ const App = () => {
         // If the name exists, update the existing entry
         await updateEntry(name, phoneNumber, existingEntryID); // Ensure this also completes before moving on
       }
-    
+
       try {
         // Fetch the updated list from the server
         const data = await PersonsService.getAll();
@@ -34,7 +34,7 @@ const App = () => {
       } catch (error) {
         console.error('Failed to fetch persons:', error);
       }
-    
+
       console.log('Finished handleSubmit function');
   }
 
@@ -50,11 +50,11 @@ const App = () => {
           console.log("Entered Info:",name,phoneNumber);
           console.log("Created new entry with status:", createdPerson.name, createdPerson.phoneNumber);
           setPersons((prevPersons) => [...prevPersons, createdPerson]);
-          
-          let notificationMessage = "Entry was added successfully: " + createdPerson.name;     
-          setNotifcationMessage(notificationMessage); 
+
+          let notificationMessage = "Entry was added successfully: " + createdPerson.name;
+          setNotificationMessage(notificationMessage);
           setTimeout(()=>{
-            setNotifcationMessage(null);
+            setNotificationMessage(null);
           },3000);
 
         })
@@ -79,15 +79,15 @@ const App = () => {
             return PersonsService.getAll();
           })
           .then((data) => {
-            
+
             setPersons(data); // Update state with the new list of persons
-            
-            let notificationMessage = "Entry was deleted successfully";     
-            setNotifcationMessage(notificationMessage); 
+
+            let notificationMessage = "Entry was deleted successfully";
+            setNotificationMessage(notificationMessage);
             setTimeout(()=>{
-              setNotifcationMessage(null);
+              setNotificationMessage(null);
             },3000);
-            
+
           })
           .catch((error) => {
             console.error('Failed to delete entry:', error);
@@ -100,7 +100,7 @@ const App = () => {
 
   // Function to update an entry
   async function updateEntry(name, phoneNumber, id) {
-    
+
     console.log('In App-update Entry for id: ' + id);
     const entryToUpdate = persons.find((person) => person.name === name);
 
@@ -118,19 +118,19 @@ const App = () => {
           );
 
           let notificationMessage = "Entry was updated successfully: " + updatedPerson.name + " " + updatedPerson.phoneNumber;
-          setNotifcationMessage(notificationMessage); 
+          setNotificationMessage(notificationMessage);
           setTimeout(()=>{
-            setNotifcationMessage(null);
+            setNotificationMessage(null);
           },3000);
         })
         .catch((error) => {
           console.error('Failed to update entry :', error);
           let notificationMessage = 'Failed to update entry:' + entryToUpdate.name + " " + entryToUpdate.phoneNumber + ". Entry was already removed from the server.";
-          setNotifcationMessage(notificationMessage);
-          setNotifcationType('error'); 
+          setNotificationMessage(notificationMessage);
+          setNotificationType('error');
           setTimeout(()=>{
-            setNotifcationMessage(null);
-            setNotifcationType(null); 
+            setNotificationMessage(null);
+            setNotificationType(null);
           },3000);
 
         });
@@ -153,11 +153,11 @@ const App = () => {
         setPersons(data);
       } catch (error) {
         console.error('Failed to fetch persons:', error);
-        setNotifcationMessage('Failed to fetch persons. Please try again later.');
-        setNotifcationType('error');
+        setNotificationMessage('Failed to fetch persons. Please try again later.');
+        setNotificationType('error');
         setTimeout(() => {
-          setNotifcationMessage(null);
-          setNotifcationType(null);
+          setNotificationMessage(null);
+          setNotificationType(null);
         }, 3000);
       }
     };
