@@ -1,9 +1,7 @@
 package phonebook.phonebook;
-import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,60 +11,47 @@ public class PhoneBookController {
 
     private final PhoneBookRepository phoneBookRepository;
 
-
-    // Constructor injection
     public PhoneBookController(PhoneBookRepository phoneBookRepository) {
         this.phoneBookRepository = phoneBookRepository;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PhoneBookEntry> findByID(@PathVariable Long id) {
-       Optional<PhoneBookEntry> phoneBookEntry = phoneBookRepository.findById(id);
-        if(phoneBookEntry.isPresent()){
-            return ResponseEntity.ok(phoneBookEntry.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<PhoneBookEntry> findById(@PathVariable Long id) {
+        Optional<PhoneBookEntry> phoneBookEntry = phoneBookRepository.findById(id);
+        return phoneBookEntry.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<PhoneBookEntry>> findAll() {
         List<PhoneBookEntry> phoneBookEntries = (List<PhoneBookEntry>) phoneBookRepository.findAll();
-
-        System.out.println("This is the size of all phonebook entries " + phoneBookEntries.size());
-        if(phoneBookEntries.size() > 0){
-            return ResponseEntity.ok(phoneBookEntries);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return phoneBookEntries.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(phoneBookEntries);
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<Void> updateEntry(@PathVariable Long id, @RequestBody PhoneBookEntry incomingPhoneBookEntry) {
-        Optional<PhoneBookEntry> existingPhoneBookEntry = phoneBookRepository.findById(id);
-        if (existingPhoneBookEntry.isPresent()) {
-            PhoneBookEntry updatedPhoneBookEntry = new PhoneBookEntry(id, incomingPhoneBookEntry.name(), incomingPhoneBookEntry.phoneNumber());
-            phoneBookRepository.save(updatedPhoneBookEntry);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<PhoneBookEntry> updateEntry(@PathVariable Long id, @RequestBody PhoneBookEntry incomingPhoneBookEntry) {
+        return phoneBookRepository.findById(id).map(existingEntry -> {
+            existingEntry.setName(incomingPhoneBookEntry.getName());
+            existingEntry.setPhoneNumber(incomingPhoneBookEntry.getPhoneNumber());
+            phoneBookRepository.save(existingEntry);
+            return ResponseEntity.ok(existingEntry);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping()
-    public ResponseEntity<PhoneBookEntry> saveEntry(@RequestBody PhoneBookEntry newPhoneBookRequest){
-        PhoneBookEntry savedPhoneBookEntry = new PhoneBookEntry(null,newPhoneBookRequest.name(), newPhoneBookRequest.phoneNumber());
+    @PostMapping
+    public ResponseEntity<PhoneBookEntry> saveEntry(@RequestBody PhoneBookEntry newPhoneBookRequest) {
+        PhoneBookEntry savedPhoneBookEntry = new PhoneBookEntry();
+        savedPhoneBookEntry.setName(newPhoneBookRequest.getName());
+        savedPhoneBookEntry.setPhoneNumber(newPhoneBookRequest.getPhoneNumber());
         phoneBookRepository.save(savedPhoneBookEntry);
-        return ResponseEntity.ok(newPhoneBookRequest);
+        return ResponseEntity.ok(savedPhoneBookEntry);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<PhoneBookEntry>> deleteEntry(@PathVariable long id) {
-
-        if (phoneBookRepository.findById(id).isPresent()){
+    public ResponseEntity<Void> deleteEntry(@PathVariable long id) {
+        if (phoneBookRepository.existsById(id)) {
             phoneBookRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
     }
-
 }

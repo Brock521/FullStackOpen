@@ -1,8 +1,7 @@
 package phonebook.phonebook;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface PhoneBookRepository extends CrudRepository<PhoneBookEntry, Long> {
+
+public interface PhoneBookRepository extends JpaRepository<PhoneBookEntry, Long> {
 }

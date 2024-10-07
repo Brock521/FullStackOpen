@@ -1,5 +1,5 @@
-CREATE TABLE PHONEBOOKENTRIES (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    NAME VARCHAR(256),
-    PHONENUMBER VARCHAR(256)
+create table phone_book_entries (
+    id int auto_increment primary key,
+    name varchar(256),
+    phone_number varchar(256)
 );
