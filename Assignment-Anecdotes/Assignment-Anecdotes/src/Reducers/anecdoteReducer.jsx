@@ -1,4 +1,5 @@
 
+
 const input = [
     'If it hurts, do it more often.',
     'Adding manpower to a late software project makes it later!',
@@ -16,10 +17,19 @@ const input = [
     votes: 0
   }));
 
+  function generateID(state){
+   let lastIndex = state.length - 1;
+    if (lastIndex > 0) {
+     return lastIndex + 1;
+    }else {
+        return 0;
+    }
+  }
+
 export default function anecdoteReducer(state = initialState, action){
 
     switch (action.type){
-        case  'INCREMENTVOTE':
+        case  'INCREMENT_VOTE':
             //Need to find the anecdote with the right ID, then increment
           
             const updatedAnecdotes = state.map((anecdote) => (
@@ -28,6 +38,16 @@ export default function anecdoteReducer(state = initialState, action){
 
             return updatedAnecdotes;
         break;
+
+        case 'ADD_ANECDOTE':
+            if(action.payload.anecdote != ""){
+                const updatedAnecdotes = state.concat({...action.payload, id: generateID(state)});
+                return updatedAnecdotes
+            }
+
+            return state;
+        break;
+
         default:
         return state;
     }
