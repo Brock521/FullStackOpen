@@ -4,12 +4,14 @@ import { Provider } from 'react-redux'
 import App from './App'
 import anecdoteSlice from './Reducers/anecdoteReducer';
 import anecdoteFilterSlice from './Reducers/anecdoteFilterReducer';
+import notificationSlice from './Reducers/notificationReducer';
 
 //Configure store
 const store = configureStore({
   reducer:{
     anecdotes: anecdoteSlice,
-    filter: anecdoteFilterSlice
+    filter: anecdoteFilterSlice,
+    notification: notificationSlice
   }
 });
 
