@@ -1,25 +1,24 @@
 import { useDispatch } from "react-redux";
-
+import { setFilter, resetFilter } from "./Reducers/anecdoteFilterReducer";
 
 function Filter() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    function handleTextChange(event) {
-        const value = event.target.value.trim();
-
-        if (value === "") {
-            dispatch({ type: "RESET_FILTER" });  // Use RESET_FILTER action
-        } else {
-            console.log('Dispatching with filter');
-            dispatch({ type: 'FILTER', payload: value });
-        }
+  function handleTextChange(event) {
+    const value = event.target.value.trim();
+    if (value === "") {
+      dispatch(resetFilter());  // Reset filter when input is empty
+    } else {
+      dispatch(setFilter(value));  // Set new filter value
     }
+  }
 
-    return(
-        <div>
-            <strong>Filter</strong><input onInput={handleTextChange} />
-        </div>
-    );
+  return (
+    <div>
+      <strong>Filter</strong>
+      <input onInput={handleTextChange} />
+    </div>
+  );
 }
 
 export default Filter;

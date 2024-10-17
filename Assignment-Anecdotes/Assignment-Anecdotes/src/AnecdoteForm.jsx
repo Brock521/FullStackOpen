@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { useState } from 'react';
+import { addAnecdote } from "./Reducers/anecdoteReducer";
 
  function AnecdoteForm(){
     const dispatch = useDispatch();
@@ -13,10 +14,9 @@ import { useState } from 'react';
       />
       <button 
         onClick={() =>  
-          dispatch({ 
-            type: 'ADD_ANECDOTE', 
-            payload: { id: null, votes: 0, anecdote: customAnecdoteEntry } 
-          })
+          dispatch(addAnecdote(         
+          { id: null, votes: 0, anecdote: customAnecdoteEntry } 
+          ))
         }
       >
         Add
