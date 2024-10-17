@@ -33,7 +33,7 @@ const anecdoteSlice = createSlice({
     incrementVote(state, action) {
       const { id } = action.payload;
       const anecdote = state.find((a) => a.id === id);
-      if (anecdote) anecdote.votes += 1; // Directly mutating state with Immer
+      if (anecdote) anecdote.votes += 1; 
     },
 
     // Add Anecdote Reducer

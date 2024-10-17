@@ -5,6 +5,7 @@ import App from './App'
 import anecdoteSlice from './Reducers/anecdoteReducer';
 import anecdoteFilterSlice from './Reducers/anecdoteFilterReducer';
 
+//Configure store
 const store = configureStore({
   reducer:{
     anecdotes: anecdoteSlice,
